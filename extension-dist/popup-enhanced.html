@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexAPI Detector - Advanced</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 450px;
+      height: 650px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      overflow: hidden;
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 16px;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.7);
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border-bottom: 2px solid #fbbf24;
+    }
+
+    .tab:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .content {
+      height: 500px;
+      overflow-y: auto;
+      padding: 16px;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .api-call {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .method {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 10px;
+    }
+
+    .method.get { background: #10b981; }
+    .method.post { background: #3b82f6; }
+    .method.put { background: #f59e0b; }
+    .method.delete { background: #ef4444; }
+
+    .status.success { color: #10b981; }
+    .status.error { color: #ef4444; }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .metric-value {
+      font-weight: 600;
+      color: #fbbf24;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin: 4px;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      border-color: #3b82f6;
+    }
+
+    .btn-success {
+      background: #10b981;
+      border-color: #10b981;
+    }
+
+    .btn-warning {
+      background: #f59e0b;
+      border-color: #f59e0b;
+    }
+
+    .security-alert {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .security-alert h4 {
+      color: #fca5a5;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .feature-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(16, 185, 129, 0.3));
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .feature-card h3 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #fbbf24;
+    }
+
+    .feature-card p {
+      font-size: 11px;
+      line-height: 1.4;
+      margin-bottom: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .workflow-step {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 8px;
+      margin-bottom: 8px;
+      font-size: 11px;
+    }
+
+    .endpoint-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+      padding: 8px;
+      margin-bottom: 6px;
+      font-size: 11px;
+    }
+
+    .progress-bar {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      height: 6px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #10b981, #3b82f6);
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .footer {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .footer button {
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+
+    .footer button:hover {
+      transform: translateY(-1px);
+    }
+
+    .scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .scrollbar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>NexAPI Detector</h1>
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span id="status-text">Monitoring Active</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="monitor">Monitor</button>
+    <button class="tab" data-tab="analytics">Analytics</button>
+    <button class="tab" data-tab="security">Security</button>
+    <button class="tab" data-tab="docs">Docs</button>
+    <button class="tab" data-tab="workflows">Workflows</button>
+  </div>
+
+  <div class="content scrollbar">
+    <!-- Monitor Tab -->
+    <div id="monitor" class="tab-content active">
+      <div class="card">
+        <div class="metric">
+          <span>APIs Detected:</span>
+          <span class="metric-value" id="api-count">0</span>
+        </div>
+        <div class="metric">
+          <span>Success Rate:</span>
+          <span class="metric-value" id="success-rate">100%</span>
+        </div>
+        <div class="metric">
+          <span>Avg Response Time:</span>
+          <span class="metric-value" id="avg-response">0ms</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Recent API Calls</h3>
+        <div id="api-calls-list">
+          <div class="empty-state">
+            <p>No API calls detected yet.<br>Navigate to a website to start monitoring.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics" class="tab-content">
+      <div class="feature-card">
+        <h3>Advanced Analytics</h3>
+        <p>Get comprehensive insights into your API usage patterns, performance metrics, and optimization opportunities.</p>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="openFullDashboard()">Open Full Dashboard</button>
+          <button class="btn" onclick="exportAnalytics()">Export Data</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Performance Insights</h3>
+        <div id="performance-metrics">
+          <div class="loading">Loading analytics...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Tab -->
+    <div id="security" class="tab-content">
+      <div class="card">
+        <h3>Security Scan</h3>
+        <div id="security-alerts">
+          <div class="loading">Scanning for vulnerabilities...</div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-warning" onclick="runSecurityScan()">Run Full Scan</button>
+          <button class="btn" onclick="viewSecurityReport()">View Report</button>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <h3>AI-Powered Security Analysis</h3>
+        <p>Detect SQL injection, XSS vulnerabilities, authentication flaws, and CORS misconfigurations automatically.</p>
+        <button class="btn btn-primary" onclick="openSecurityDashboard()">Open Security Center</button>
+      </div>
+    </div>
+
+    <!-- Documentation Tab -->
+    <div id="docs" class="tab-content">
+      <div class="feature-card">
+        <h3>Auto-Generated Documentation</h3>
+        <p>Generate comprehensive OpenAPI specifications and interactive documentation from detected API endpoints.</p>
+        <div class="actions">
+          <button class="btn btn-success" onclick="generateDocs()">Generate Docs</button>
+          <button class="btn" onclick="viewDocs()">View Documentation</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Discovered Endpoints</h3>
+        <div id="endpoints-list">
+          <div class="empty-state">
+            <p>No endpoints documented yet.<br>Start browsing to discover APIs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workflows Tab -->
+    <div id="workflows" class="tab-content">
+      <div class="feature-card">
+        <h3>API Workflow Analysis</h3>
+        <p>Discover API dependencies, sequence patterns, and create automated testing workflows.</p>
+        <div class="actions">
+          <button class="btn btn-primary" onclick="analyzeWorkflows()">Analyze Workflows</button>
+          <button class="btn" onclick="viewWorkflowMap()">View Workflow Map</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Detected Workflows</h3>
+        <div id="workflows-list">
+          <div class="empty-state">
+            <p>No workflows detected yet.<br>Use applications to discover API sequences.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button onclick="openFullApplication()">Open Full Application</button>
+  </div>
+
+  <script src="popup-enhanced.js"></script>
+</body>
+</html>

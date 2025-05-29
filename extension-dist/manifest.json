@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "NexAPI Detector",
+  "version": "1.0.0",
+  "description": "Comprehensive API monitoring, analytics, and workflow integration tool for developers",
+  "permissions": [
+    "webRequest",
+    "storage",
+    "activeTab",
+    "downloads"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:5000/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup-enhanced.html",
+    "default_title": "NexAPI Detector",
+    "default_icon": {
+      "16": "icon-16.png",
+      "32": "icon-32.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

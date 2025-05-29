@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexAPI Detector</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            width: 400px;
+            min-height: 500px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1976d2, #1565c0);
+            color: white;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover {
+            background: #f1f5f9;
+        }
+        
+        .tab.active {
+            color: #1976d2;
+            border-bottom-color: #1976d2;
+            background: white;
+        }
+        
+        .content {
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .api-call {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .api-call-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .method {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+        
+        .method.GET { background: #dcfce7; color: #166534; }
+        .method.POST { background: #dbeafe; color: #1d4ed8; }
+        .method.PUT { background: #fef3c7; color: #92400e; }
+        .method.DELETE { background: #fee2e2; color: #dc2626; }
+        
+        .status {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        .status.success { background: #dcfce7; color: #166534; }
+        .status.error { background: #fee2e2; color: #dc2626; }
+        .status.pending { background: #f3f4f6; color: #6b7280; }
+        
+        .url {
+            font-weight: 500;
+            word-break: break-all;
+            margin-bottom: 4px;
+        }
+        
+        .timestamp {
+            color: #64748b;
+            font-size: 11px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            opacity: 0.5;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .btn:hover {
+            background: #1565c0;
+        }
+        
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NexAPI Detector</h1>
+        <p>Real-time API monitoring & analytics</p>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" data-tab="monitor">Monitor</div>
+        <div class="tab" data-tab="analytics">Analytics</div>
+        <div class="tab" data-tab="settings">Settings</div>
+    </div>
+    
+    <div class="content">
+        <div id="monitor-tab" class="tab-content">
+            <div class="actions">
+                <button class="btn btn-secondary" id="clear-btn">Clear</button>
+                <button class="btn" id="export-btn">Export</button>
+            </div>
+            
+            <div id="api-calls-container">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L13.09 8.26L21 9L13.09 15.74L12 22L10.91 15.74L3 9L10.91 8.26L12 2Z"/>
+                    </svg>
+                    <p>No API calls detected yet</p>
+                    <p style="font-size: 11px; margin-top: 8px;">Navigate to a website with API endpoints to start monitoring</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="analytics-tab" class="tab-content" style="display: none;">
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-requests">0</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="unique-endpoints">0</div>
+                    <div class="stat-label">Unique Endpoints</div>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="success-rate">0%</div>
+                    <div class="stat-label">Success Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-response">0ms</div>
+                    <div class="stat-label">Avg Response</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="settings-tab" class="tab-content" style="display: none;">
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <h3 style="font-size: 14px; margin-bottom: 12px;">Detection Settings</h3>
+                
+                <label style="display: flex; align-items: center; margin-bottom: 8px; font-size: 12px;">
+                    <input type="checkbox" id="auto-detect" checked style="margin-right: 8px;">
+                    Auto-detect API calls
+                </label>
+                
+                <label style="display: flex; align-items: center; margin-bottom: 8px; font-size: 12px;">
+                    <input type="checkbox" id="include-headers" checked style="margin-right: 8px;">
+                    Capture request headers
+                </label>
+                
+                <label style="display: flex; align-items: center; font-size: 12px;">
+                    <input type="checkbox" id="filter-extensions" checked style="margin-right: 8px;">
+                    Filter out browser extensions
+                </label>
+            </div>
+            
+            <div style="background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; margin-top: 12px;">
+                <h3 style="font-size: 14px; margin-bottom: 12px;">Export Options</h3>
+                
+                <button class="btn" id="export-json" style="width: 100%; margin-bottom: 8px;">Export as JSON</button>
+                <button class="btn btn-secondary" id="export-csv" style="width: 100%;">Export as CSV</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
